@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}About Me - Teacher Portfolio{% endblock %}
+
+{% block extra_head %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="4"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        opacity: 0.3;
+    }
+    .about-card {
+        transition: all 0.4s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .about-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+    .stat-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    }
+    .skill-bar {
+        transition: width 1s ease-in-out;
+    }
+    .timeline-item {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    .timeline-item:hover {
+        transform: translateX(5px);
+    }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -25px;
+        top: 20px;
+        width: 12px;
+        height: 12px;
+        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .floating-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+    .floating-shapes .shape {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    .floating-shapes .shape:nth-child(1) {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+    .floating-shapes .shape:nth-child(2) {
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+    .floating-shapes .shape:nth-child(3) {
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    .gradient-text {
+        background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .profile-image {
+        position: relative;
+        overflow: hidden;
+    }
+    .profile-image::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+    .profile-image:hover::after {
+        transform: translateX(100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section py-20 relative">
+    <div class="floating-shapes">
+        <div class="shape w-20 h-20 bg-white rounded-full"></div>
+        <div class="shape w-16 h-16 bg-white rounded-lg transform rotate-45"></div>
+        <div class="shape w-12 h-12 bg-white rounded-full"></div>
+    </div>
+    <div class="container mx-auto px-4 lg:px-6 relative z-10">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
+                About <span class="text-yellow-300">Me</span>
+            </h1>
+            <p class="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+                Passionate educator dedicated to inspiring and nurturing young minds through innovative teaching methods and personalized learning experiences.
+            </p>
+            <div class="mt-8 flex justify-center space-x-4">
+                <div class="stat-card rounded-lg px-6 py-4 text-center">
+                    <div class="text-2xl font-bold text-primary">{{ teacher.experience_years|default:"10" }}+</div>
+                    <div class="text-sm text-gray-600">Years Experience</div>
+                </div>
+                <div class="stat-card rounded-lg px-6 py-4 text-center">
+                    <div class="text-2xl font-bold text-secondary">500+</div>
+                    <div class="text-sm text-gray-600">Students Taught</div>
+                </div>
+                <div class="stat-card rounded-lg px-6 py-4 text-center">
+                    <div class="text-2xl font-bold text-accent">95%</div>
+                    <div class="text-sm text-gray-600">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main About Section -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-white">
+    <div class="container mx-auto px-4 lg:px-6">
+        {% if teacher %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Profile Image -->
+            <div class="order-2 lg:order-1">
+                <div class="relative">
+                    <div class="profile-image rounded-2xl overflow-hidden shadow-2xl">
+                        {% if teacher.photo %}
+                        <img src="{{ teacher.photo.url }}" alt="{{ teacher.user.get_full_name }}" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                        <img src="https://st3.depositphotos.com/16122460/18966/i/450/depositphotos_189668580-stock-photo-young-male-teacher-with-book.jpg" 
+                             alt="Teacher" 
+                             class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500">
+                        {% endif %}
+                    </div>
+                    <!-- Decorative elements -->
+                    <div class="absolute -top-4 -right-4 w-24 h-24 bg-primary rounded-full opacity-20 animate-pulse"></div>
+                    <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-secondary rounded-full opacity-15 animate-pulse" style="animation-delay: 1s;"></div>
+                </div>
+            </div>
+            
+            <!-- About Content -->
+            <div class="order-1 lg:order-2">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-4">
+                        <span class="gradient-text">{{ teacher.user.get_full_name|default:"Narayan Shrestha" }}</span>
+                    </h2>
+                    <p class="text-lg text-gray-600 leading-relaxed mb-6">
+                        {{ teacher.bio|safe|default:"Dedicated and passionate educator with over a decade of experience in shaping young minds. I believe in creating an inclusive and engaging learning environment that fosters creativity, critical thinking, and lifelong learning. My approach combines traditional teaching methods with modern educational technology to ensure every student reaches their full potential." }}
+                    </p>
+                    
+                    <!-- Key Information -->
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-4 bg-white rounded-lg shadow-soft hover:shadow-medium transition-shadow duration-300">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Experience</h4>
+                                <p class="text-gray-600">{{ teacher.experience_years|default:"10" }} years in education</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-4 bg-white rounded-lg shadow-soft hover:shadow-medium transition-shadow duration-300">
+                            <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Contact</h4>
+                                <p class="text-gray-600">{{ teacher.contact_email|default:"teacher@example.com" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-4 bg-white rounded-lg shadow-soft hover:shadow-medium transition-shadow duration-300">
+                            <div class="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">Location</h4>
+                                <p class="text-gray-600">{{ teacher.address|default:"Educational District" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-20">
+            <div class="max-w-2xl mx-auto">
+                <i class="fas fa-user-graduate text-6xl text-gray-300 mb-6"></i>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Teacher Information Not Available</h2>
+                <p class="text-gray-600 text-lg">We're working on updating the teacher profile. Please check back soon!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Skills & Expertise Section -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-4 lg:px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">
+                <span class="gradient-text">Skills & Expertise</span>
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                Areas of specialization and core competencies in education and student development.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Teaching Skills -->
+            <div class="about-card bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-soft">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">Teaching Skills</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Curriculum Development</span>
+                            <span class="text-primary font-semibold">95%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-primary to-secondary h-3 rounded-full" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Student Engagement</span>
+                            <span class="text-secondary font-semibold">90%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-secondary to-accent h-3 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Assessment & Evaluation</span>
+                            <span class="text-accent font-semibold">88%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-accent to-primary h-3 rounded-full" style="width: 88%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Technical Skills -->
+            <div class="about-card bg-gradient-to-br from-white to-gray-50 p-8 rounded-2xl shadow-soft">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">Technical Skills</h3>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Educational Technology</span>
+                            <span class="text-primary font-semibold">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-primary to-secondary h-3 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Digital Learning Platforms</span>
+                            <span class="text-secondary font-semibold">92%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-secondary to-accent h-3 rounded-full" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-700 font-medium">Data Analysis</span>
+                            <span class="text-accent font-semibold">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="skill-bar bg-gradient-to-r from-accent to-primary h-3 rounded-full" style="width: 80%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Education & Experience Timeline -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-white">
+    <div class="container mx-auto px-4 lg:px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">
+                <span class="gradient-text">Education & Experience</span>
+            </h2>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">
+                My journey in education and professional development over the years.
+            </p>
+        </div>
+        
+        <div class="max-w-4xl mx-auto">
+            <div class="relative">
+                <!-- Timeline line -->
+                <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-accent"></div>
+                
+                <div class="space-y-12">
+                    <!-- Experience Item 1 -->
+                    <div class="timeline-item ml-16 p-6 bg-white rounded-xl shadow-soft">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-chalkboard-teacher text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Senior Teacher</h3>
+                                <p class="text-primary font-semibold mb-2">Current Position • 2020 - Present</p>
+                                <p class="text-gray-600 leading-relaxed">Leading curriculum development and mentoring junior teachers. Implementing innovative teaching methodologies and digital learning solutions.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Item 2 -->
+                    <div class="timeline-item ml-16 p-6 bg-white rounded-xl shadow-soft">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-secondary to-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user-graduate text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Master's in Education</h3>
+                                <p class="text-secondary font-semibold mb-2">Educational Psychology • 2018</p>
+                                <p class="text-gray-600 leading-relaxed">Specialized in educational psychology and child development. Graduated with distinction and research focus on innovative teaching methods.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Item 3 -->
+                    <div class="timeline-item ml-16 p-6 bg-white rounded-xl shadow-soft">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-school text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Teaching Career Started</h3>
+                                <p class="text-accent font-semibold mb-2">Junior Teacher • 2014</p>
+                                <p class="text-gray-600 leading-relaxed">Began my teaching journey with a passion for education and student development. Focused on creating engaging and inclusive learning environments.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Teaching Philosophy -->
+<section class="py-20 bg-gradient-to-r from-primary to-secondary relative overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class="container mx-auto px-4 lg:px-6 relative z-10">
+        <div class="text-center max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold text-white mb-8">My Teaching Philosophy</h2>
+            <blockquote class="text-xl text-blue-100 leading-relaxed italic mb-8">
+                "Education is not the filling of a pail, but the lighting of a fire. Every student has unique potential waiting to be discovered and nurtured. My role is to create an environment where curiosity thrives, confidence grows, and learning becomes a lifelong passion."
+            </blockquote>
+            <div class="flex justify-center">
+                <div class="w-24 h-1 bg-yellow-300 rounded-full"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_script %}
+<script>
+$(document).ready(function() {
+    // Animate skill bars when they come into view
+    function animateSkillBars() {
+        $('.skill-bar').each(function() {
+            const $this = $(this);
+            const width = $this.attr('style').match(/width:\s*(\d+)%/);
+            if (width) {
+                $this.css('width', '0%');
+                $this.animate({ width: width[1] + '%' }, 1500);
+            }
+        });
+    }
+    
+    // Trigger animation when section is in view
+    $(window).scroll(function() {
+        const skillsSection = $('#skills-section');
+        if (skillsSection.length) {
+            const sectionTop = skillsSection.offset().top;
+            const windowTop = $(window).scrollTop();
+            const windowHeight = $(window).height();
+            
+            if (windowTop + windowHeight > sectionTop + 100) {
+                animateSkillBars();
+                $(window).off('scroll'); // Remove event after animation
+            }
+        }
+    });
+    
+    // Add smooth scroll behavior for internal links
+    $('a[href^="#"]').on('click', function(e) {
+        e.preventDefault();
+        const target = this.hash;
+        const $target = $(target);
+        
+        if ($target.length) {
+            $('html, body').animate({
+                'scrollTop': $target.offset().top - 80
+            }, 800, 'swing');
+        }
+    });
+    
+    // Add parallax effect to floating shapes
+    $(window).scroll(function() {
+        const scrolled = $(window).scrollTop();
+        const rate = scrolled * -0.5;
+        $('.floating-shapes').css('transform', 'translate3d(0, ' + rate + 'px, 0)');
+    });
+});
+</script>
+{% endblock %}

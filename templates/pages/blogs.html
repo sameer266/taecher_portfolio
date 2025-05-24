@@ -1,0 +1,480 @@
+{% extends "base.html" %}
+
+{% block title %}Video Blogs - Teacher Portfolio{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary: #4f46e5;
+        --primary-hover: #4338ca;
+        --accent: #ec4899;
+        --accent-hover: #db2777;
+    }
+    
+    .video-card {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
+    }
+    
+    .video-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    .video-thumbnail-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+    
+    .video-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .video-card:hover .video-thumbnail {
+        transform: scale(1.05);
+    }
+    
+    .play-button-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .video-card:hover .play-button-overlay {
+        opacity: 1;
+    }
+    
+    .play-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    
+    .play-icon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--primary);
+        margin-left: 4px;
+    }
+    
+    .play-button-overlay:hover .play-icon {
+        transform: scale(1.1);
+        background: white;
+    }
+    
+    /* Modern Modal Styles */
+    .video-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .video-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .modal-container {
+        width: 90%;
+        max-width: 1100px;
+        position: relative;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
+    
+    .video-modal.active .modal-container {
+        transform: scale(1);
+    }
+    
+    .video-wrapper {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+        border-radius: 12px;
+        background: black;
+    }
+    
+    .video-wrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    .close-button {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    
+    .close-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .close-button svg {
+        width: 20px;
+        height: 20px;
+        color: white;
+    }
+    
+    /* Video info in modal */
+    .video-info {
+        margin-top: 20px;
+        color: white;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .video-info h3 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    
+    .video-info p {
+        opacity: 0.8;
+        line-height: 1.6;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .modal-container {
+            width: 95%;
+        }
+        
+        .close-button {
+            top: -50px;
+            width: 44px;
+            height: 44px;
+        }
+    }
+    
+    /* Loading spinner */
+    .video-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    /* Subject tag */
+    .subject-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary);
+        margin-bottom: 12px;
+    }
+    
+    .subject-tag svg {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+    }
+    
+    /* Video grid */
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 12px;
+        border: 1px dashed rgba(0, 0, 0, 0.1);
+    }
+    
+    .empty-state svg {
+        width: 60px;
+        height: 60px;
+        color: rgba(0, 0, 0, 0.2);
+        margin-bottom: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Video Blogs Section -->
+<section class=" bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-light text-gray-900 mb-4 tracking-tight">Video Blogs</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Explore engaging video content to deepen your understanding of various subjects.
+            </p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-10">
+            <div class="flex-1 relative">
+                <input type="text" id="searchInput" placeholder="Search videos..." 
+                       class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm">
+                <svg class="absolute right-3 top-3.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="w-full sm:w-48">
+                <select id="subjectFilter" 
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-sm appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93biI+PHBhdGggZD0ibTYgOSA2IDYgNi02Ii8+PC9zdmc+')] bg-no-repeat bg-[right_0.75rem_center] bg-[length:1.25rem]">
+                    <option value="">All Subjects</option>
+                    {% for subject in subjects %}
+                        <option value="{{ subject.slug }}">{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div id="videoGrid" class="video-grid">
+            {% for video in videos %}
+            <div class="video-card" data-subject="{{ video.subject.slug }}" data-title="{{ video.title|lower }}">
+                <div class="p-5">
+                    <span class="subject-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        {{ video.subject.name }}
+                    </span>
+                    
+                    <div class="video-thumbnail-container">
+                        <img src="{{ video.image }}" alt="{{ video.title }}" class="video-thumbnail">
+                        <div class="play-button-overlay" onclick="openVideoModal('{{ video.slug }}')">
+                            <div class="play-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-900 mt-4 mb-2 line-clamp-2">{{ video.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">{{ video.description|default:"Educational video content for "|add:video.subject.name }}</p>
+                    
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-500 flex items-center">
+                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {{ video.uploaded_at|date:"M j, Y" }}
+                        </span>
+                        <div class="flex space-x-4">
+                            <button onclick="openVideoModal('{{ video.slug }}')" 
+                                    class="text-primary hover:text-primary-hover font-medium flex items-center">
+                                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                </svg>
+                                Play
+                            </button>
+                            <a href="{{ video.video_url }}" target="_blank" 
+                               class="text-gray-600 hover:text-gray-800 font-medium flex items-center">
+                                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not videos %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No videos available yet</h3>
+                <p class="text-gray-600 max-w-md mx-auto">
+                    We're preparing engaging video content. Check back soon!
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Video Modal Template -->
+<div id="videoModalTemplate" class="video-modal">
+    <div class="modal-container">
+        <button class="close-button" onclick="closeVideoModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        
+        <div class="video-wrapper">
+            <div class="video-loading"></div>
+            <!-- Video iframe will be inserted here -->
+        </div>
+        
+        <div class="video-info">
+            <h3 id="modalVideoTitle" class="font-bold"></h3>
+            <p id="modalVideoDescription" class="text-sm"></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variable to track current video
+let currentVideoSlug = null;
+
+function openVideoModal(slug) {
+    currentVideoSlug = slug;
+    const video = document.querySelector(`.video-card[data-title="${slug.toLowerCase()}"]`);
+    
+    if (!video) return;
+    
+    const modal = document.getElementById('videoModalTemplate');
+    const title = video.querySelector('h3').textContent;
+    const description = video.querySelector('p').textContent;
+    const videoUrl = video.querySelector('a[target="_blank"]').href;
+    
+    // Set video info in modal
+    document.getElementById('modalVideoTitle').textContent = title;
+    document.getElementById('modalVideoDescription').textContent = description;
+    
+    // Create iframe for YouTube video (assuming YouTube URLs)
+    let videoId = extractYouTubeId(videoUrl);
+    let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+    
+    const videoWrapper = modal.querySelector('.video-wrapper');
+    videoWrapper.innerHTML = `
+        <iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    `;
+    
+    // Show modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    // Add keyboard event listener
+    document.addEventListener('keydown', handleModalKeyDown);
+}
+
+function closeVideoModal() {
+    const modal = document.getElementById('videoModalTemplate');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    
+    // Remove video iframe to stop playback
+    const videoWrapper = modal.querySelector('.video-wrapper');
+    videoWrapper.innerHTML = '<div class="video-loading"></div>';
+    
+    // Remove keyboard event listener
+    document.removeEventListener('keydown', handleModalKeyDown);
+    
+    currentVideoSlug = null;
+}
+
+function handleModalKeyDown(e) {
+    if (e.key === 'Escape') {
+        closeVideoModal();
+    }
+}
+
+// Helper function to extract YouTube ID from URL
+function extractYouTubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+// Close modal when clicking on backdrop
+document.getElementById('videoModalTemplate').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeVideoModal();
+    }
+});
+
+// Search and filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const subjectFilter = document.getElementById('subjectFilter');
+    const videoGrid = document.getElementById('videoGrid');
+    const videos = videoGrid.querySelectorAll('.video-card');
+
+    function filterVideos() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedSubject = subjectFilter.value;
+
+        videos.forEach(video => {
+            const title = video.dataset.title;
+            const subject = video.dataset.subject;
+            const matchesSearch = title.includes(searchTerm);
+            const matchesSubject = !selectedSubject || subject === selectedSubject;
+
+            video.style.display = matchesSearch && matchesSubject ? 'block' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterVideos);
+    subjectFilter.addEventListener('change', filterVideos);
+});
+</script>
+{% endblock %}

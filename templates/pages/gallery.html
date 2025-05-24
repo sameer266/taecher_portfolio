@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+<section class="min-h-screen  bg-white">
+    <div class="container mx-auto px-4">
+        <!-- Clean Header -->
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-light text-gray-900 mb-4 tracking-tight">Gallery</h1>
+            <div class="w-24 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto"></div>
+        </div>
+
+        <!-- Modern Filter Pills -->
+        <div class="flex flex-wrap justify-center gap-2 mb-16">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="education">Education</button>
+            <button class="filter-btn" data-filter="program">Programs</button>
+            <button class="filter-btn" data-filter="event">Events</button>
+            <button class="filter-btn" data-filter="achievement">Achievements</button>
+        </div>
+
+        <!-- Modern Grid -->
+        {% if gallery_items %}
+        <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {% for item in gallery_items %}
+            <div class="gallery-item group" data-category="{{ item.category }}">
+                <div class="relative overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2">
+                    <div class="aspect-square overflow-hidden">
+                        <img src="{{ item.image.url }}" 
+                             alt="{{ item.title }}"
+                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                             data-fancybox="gallery"
+                             data-caption="{{ item.title }}">
+                    </div>
+                    
+                    <!-- Minimal Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-white font-medium text-sm">{{ item.title }}</h3>
+                            <span class="text-white/80 text-xs">{{ item.get_category_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Clean Empty State -->
+        <div class="text-center py-24">
+            <div class="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-light text-gray-900 mb-2">No images yet</h3>
+            <p class="text-gray-500">Gallery is empty. Check back soon!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css">
+
+<script>
+$(document).ready(function() {
+    // Initialize Fancybox
+    $('[data-fancybox="gallery"]').fancybox({
+        buttons: ["zoom", "slideShow", "fullScreen", "close"],
+        loop: true,
+        animationEffect: "zoom-in-out",
+        transitionEffect: "slide"
+    });
+    
+    // Modern Filter System
+    $('.filter-btn').click(function() {
+        const filter = $(this).data('filter');
+        
+        // Update active state
+        $('.filter-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        // Filter items with smooth animation
+        $('.gallery-item').each(function() {
+            const $item = $(this);
+            const category = $item.data('category');
+            
+            if (filter === 'all' || category === filter) {
+                $item.removeClass('hidden').addClass('animate-fade-in');
+            } else {
+                $item.addClass('hidden').removeClass('animate-fade-in');
+            }
+        });
+    });
+    
+    // Scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-slide-up');
+            }
+        });
+    }, observerOptions);
+    
+    $('.gallery-item').each(function() {
+        observer.observe(this);
+    });
+});
+</script>
+
+<style>
+/* Modern Filter Buttons */
+.filter-btn {
+    @apply px-6 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-full transition-all duration-300 hover:bg-gray-200;
+}
+
+.filter-btn.active {
+    @apply bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg;
+}
+
+/* Animations */
+.gallery-item {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.animate-slide-up {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .filter-btn {
+        @apply px-4 py-2 text-xs;
+    }
+}
+
+/* Custom Fancybox styling */
+.fancybox-bg {
+    background: rgba(0, 0, 0, 0.95) !important;
+}
+
+.fancybox-toolbar {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+</style>
+{% endblock %}

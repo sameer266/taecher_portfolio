@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - Teacher Portfolio{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Back button -->
+        <div class="mb-8">
+            <a onclick="history.back()" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200 group">
+                <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                <span class="font-medium">Back to Books</span>
+            </a>
+        </div>
+
+        <!-- Book Header -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-10 border border-gray-100">
+            <div class="md:flex">
+            <!-- Book Cover Image -->
+            <div class="md:w-1/3 bg-gradient-to-br from-indigo-50 to-blue-50 flex items-center justify-center p-8">
+                {% if book.cover_image %}
+                <div class="relative w-full h-[400px] overflow-hidden rounded-lg shadow-lg transition-transform duration-300 hover:scale-105">
+                <img src="{{ book.cover_image.url }}" 
+                     alt="{{ book.title }} cover" 
+                     class="w-full h-full object-contain transform hover:scale-110 transition-transform duration-500"
+                     loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                </div>
+                {% else %}
+                <div class="text-center p-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                <svg class="w-32 h-32 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+                <p class="mt-4 text-gray-500 font-medium">No cover image available</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Rest of the content remains the same -->
+            <div class="md:w-2/3 p-8">
+                <div class="flex flex-wrap gap-2 mb-4">
+                <span class="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                    {{ book.subject.name }}
+                </span>
+                {% if book.grade_level %}
+                <span class="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    Grade {{ book.grade_level }}
+                </span>
+                {% endif %}
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ book.title }}</h1>
+                
+                {% if book.author %}
+                <p class="text-lg text-gray-600 mb-4">By {{ book.author }}</p>
+                {% endif %}
+                
+                <div class="flex items-center text-gray-500 mb-6">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>Uploaded {{ book.uploaded_at|date:"F j, Y" }}</span>
+                </div>
+                
+                {% if book.description %}
+                <div class="prose prose-indigo max-w-none text-gray-600 mb-6">
+                {{ book.description|linebreaks }}
+                </div>
+                {% endif %}
+                
+                <div class="flex flex-wrap gap-4">
+                <a href="{{ book.file.url }}" 
+                   download
+                   class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Download Book
+                </a>
+                
+                <a href="{{ book.file.url }}" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition-colors duration-200 border border-gray-300 shadow-sm hover:shadow">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Preview
+                </a>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Book Details Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- File Information -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    File Information
+                </h3>
+                <ul class="space-y-3 text-gray-600">
+                    <li class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <span class="font-medium">Format:</span> 
+                        <span class="ml-1">{{ book.file.name|slice:"-3:"|upper }}</span>
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                        </svg>
+                        <span class="font-medium">Size:</span> 
+                        <span class="ml-1">{{ book.file.size|filesizeformat }}</span>
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span class="font-medium">Pages:</span> 
+                        <span class="ml-1">{{ book.page_count|default:"N/A" }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Book Metadata -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100 md:col-span-2">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    Book Details
+                </h3>
+                <ul class="space-y-3 text-gray-600">
+                    {% if book.content %}
+                    <li class="flex flex-col">
+                        <svg class="w-4 h-4 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        
+                        <div class="prose prose-indigo max-w-none">
+                            {{ book.content|safe }}
+                        </div>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+
+         
+        </div>
+
+        <!-- Related Books -->
+        {% if related_books %}
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-900">Related Books</h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                {% for related in related_books %}
+                <a href="{% url 'book_detail' related.id %}" class="group">
+                    <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:border-indigo-300 transition-colors duration-200 h-full flex flex-col">
+                        <div class="p-4 bg-gray-50 flex items-center justify-center h-40">
+                            {% if related.cover_image %}
+                            <img src="{{ related.cover_image.url }}" alt="{{ related.title }} cover" class="h-full w-auto object-contain">
+                            {% else %}
+                            <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <div class="p-4 flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors duration-200 line-clamp-2">
+                                {{ related.title }}
+                            </h3>
+                            <p class="text-sm text-gray-500 mb-2">{{ related.author|default:"Unknown Author" }}</p>
+                            <span class="inline-block px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                {{ related.subject.name }}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Custom Styles -->
+{% block extra_styles %}
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    @media print {
+        .container {
+            max-width: none;
+            padding: 0;
+        }
+        
+        nav, footer, .mb-8 {
+            display: none;
+        }
+        
+        .bg-white {
+            background-color: white !important;
+        }
+        
+        .shadow-sm, .shadow-md, .shadow-lg {
+            box-shadow: none !important;
+        }
+        
+        .border, .border-b, .border-t {
+            border: none !important;
+        }
+    }
+</style>
+{% endblock %}
+{% endblock %}

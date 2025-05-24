@@ -1,0 +1,1076 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Teacher Portfolio{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<!-- Add jQuery -->
+
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #059669;
+        --accent-color: #dc2626;
+        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .hero-pattern {
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-pattern::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+    }
+
+    .modern-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .modern-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-xl);
+        border-color: rgba(79, 70, 229, 0.1);
+    }
+
+    .card-medium {
+        max-width: 380px;
+        margin: 0 auto;
+    }
+
+    .card-image {
+        height: 200px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .modern-card:hover .card-image img {
+        transform: scale(1.05);
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(79, 70, 229, 0.8), rgba(147, 51, 234, 0.6));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slideshow-container {
+        position: relative;
+        max-width: 100%;
+        overflow: hidden;
+        height: 450px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .slideshow-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+    }
+
+    .slideshow-slide.active {
+        opacity: 1;
+        z-index: 2;
+    }
+
+    .slideshow-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .slide-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+        color: white;
+        padding: 40px 20px 20px;
+        text-align: center;
+    }
+
+    .slide-caption h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .btn-modern {
+        padding: 12px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        font-size: 1.125rem;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge-primary { background: #ede9fe; color: #7c3aed; }
+    .badge-secondary { background: #dcfce7; color: #16a34a; }
+    .badge-accent { background: #fee2e2; color: #dc2626; }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .testimonial-card::before {
+        content: '"';
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        font-size: 4rem;
+        color: var(--primary-color);
+        opacity: 0.2;
+        font-family: Georgia, serif;
+    }
+
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+        background: var(--gradient-primary);
+        flex-shrink: 0;
+    }
+
+    .star-rating {
+        display: flex;
+        gap: 2px;
+    }
+
+    .star-rating i {
+        font-size: 0.875rem;
+    }
+
+    .philosophy-feature {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .philosophy-feature:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateX(8px);
+    }
+
+    .philosophy-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background: var(--gradient-primary);
+        flex-shrink: 0;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        max-width: 90%;
+        max-height: 90%;
+        overflow: auto;
+        position: relative;
+        box-shadow: var(--shadow-xl);
+        animation: slideIn 0.3s ease;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        cursor: pointer;
+        color: #6b7280;
+        transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+        color: var(--primary-color);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(-20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .cta-section {
+        background: var(--gradient-primary);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='m0 40l40-40h-40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    @media (max-width: 768px) {
+        .card-medium {
+            max-width: 100%;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+        }
+        
+        .slideshow-container {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_header %}
+<!-- Hero Section with Slideshow -->
+<section class="hero-pattern text-white relative">
+    <div class="container mx-auto px-6 py-14 md:py-14 relative z-10">
+        <div class="flex flex-col lg:flex-row items-center gap-12">
+            <div class="lg:w-1/2">
+                <h1 class="text-5xl md:text-6xlfont-bold mb-6 leading-tight">Inspiring Education Through <span class="text-yellow-300">Innovation</span></h1>
+                <p class="text-xl mb-10 text-gray-100 leading-relaxed">Welcome to my professional teaching portfolio. Discover my teaching philosophy, classroom resources, and educational insights that make learning an adventure.</p>
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <a href="{% url 'about' %}" class="btn-modern btn-primary">
+                        <i class="fas fa-user-circle"></i>
+                        About Me
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn-modern btn-secondary">
+                        <i class="fas fa-envelope"></i>
+                        Get in Touch
+                    </a>
+                </div>
+            </div>
+            <div class="lg:w-1/2">
+                <!-- Image Slideshow -->
+                <div class="slideshow-container" id="slideshow">
+                    {% for gallery in gallery_list %}
+                    <div class="slideshow-slide {% if forloop.first %}active{% endif %}" data-slide-index="{{ forloop.counter0 }}">
+                        {% if gallery.image %}
+                            <img src="{{ gallery.image.url }}" alt="{{ gallery.title }}" class="slideshow-image">
+                        {% else %}
+                            <img src="https://via.placeholder.com/600x450?text={{ gallery.title|urlencode }}" alt="{{ gallery.title }}" class="slideshow-image">
+                        {% endif %}
+                        <div class="slide-caption">
+                            <h3>{{ gallery.title }}</h3>
+                            <p class="text-sm mt-2">{{ gallery.description|truncatechars:100 }}</p>
+                            <span class="badge badge-primary mt-2">{{ gallery.get_category_display }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="slideshow-slide active" data-slide-index="0">
+                        <img src="https://via.placeholder.com/600x450?text=Teacher+Portfolio" alt="Teacher in classroom" class="slideshow-image">
+                        <div class="slide-caption">
+                            <h3>Welcome to My Teaching Portfolio</h3>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Featured Subjects Section -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="section-header">
+            <h2 class="section-title">Subjects I Teach</h2>
+            <p class="section-subtitle">Explore my teaching approach and resources for these core subjects. Each curriculum is designed to engage students and foster critical thinking skills.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for subject in subjects %}
+            <div class="modern-card card-medium">
+                <div class="card-image {% cycle 'bg-gradient-to-br from-purple-500 to-indigo-600' 'bg-gradient-to-br from-green-500 to-emerald-600' 'bg-gradient-to-br from-red-500 to-pink-600' %}">
+                    <div class="gradient-overlay">
+                        <i class="fas {% cycle 'fa-calculator' 'fa-flask' 'fa-book-open' %} text-6xl text-white"></i>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">{{ subject.name }}</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Comprehensive resources and innovative teaching methods for {{ subject.name }}.</p>
+                    <a href="{% url 'subject_detail' subject.slug %}" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-arrow-right"></i>
+                        Explore Subject
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="modern-card card-medium">
+                <div class="card-image bg-gradient-to-br from-purple-500 to-indigo-600">
+                    <div class="gradient-overlay">
+                        <i class="fas fa-calculator text-6xl text-white"></i>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Mathematics</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Comprehensive resources and innovative teaching methods for Mathematics.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-arrow-right"></i>
+                        Explore Subject
+                    </a>
+                </div>
+            </div>
+            <div class="modern-card card-medium">
+                <div class="card-image bg-gradient-to-br from-green-500 to-emerald-600">
+                    <div class="gradient-overlay">
+                        <i class="fas fa-flask text-6xl text-white"></i>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Science</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Comprehensive resources and innovative teaching methods for Science.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-arrow-right"></i>
+                        Explore Subject
+                    </a>
+                </div>
+            </div>
+            <div class="modern-card card-medium">
+                <div class="card-image bg-gradient-to-br from-red-500 to-pink-600">
+                    <div class="gradient-overlay">
+                        <i class="fas fa-book-open text-6xl text-white"></i>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">English</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Comprehensive resources and innovative teaching methods for English.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-arrow-right"></i>
+                        Explore Subject
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Teaching Approach Section -->
+<section class="py-20">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row items-center gap-16">
+            <div class="lg:w-1/2">
+                {% if teacher.photo %}
+                <img src="{{ teacher.photo.url }}" alt="{{ teacher.user.get_full_name }}" class="rounded-2xl shadow-xl w-full h-96 object-cover">
+                {% else %}
+                <img src="https://via.placeholder.com/600x400?text=Teaching+Approach" alt="Teaching approach" class="rounded-2xl shadow-xl w-full h-96 object-cover">
+                {% endif %}
+            </div>
+            <div class="lg:w-1/2">
+                <h2 class="text-4xl font-bold mb-8 text-gray-800">My Teaching Philosophy</h2>
+                <div class="space-y-4">
+                    <div class="philosophy-feature">
+                        <div class="philosophy-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">Student-Centered Learning</h3>
+                            <p class="text-gray-600">Focusing on individual student needs and diverse learning styles to create personalized educational experiences.</p>
+                        </div>
+                    </div>
+                    <div class="philosophy-feature">
+                        <div class="philosophy-icon">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">Critical Thinking</h3>
+                            <p class="text-gray-600">Encouraging analysis, problem-solving, and independent perspectives through interactive discussions.</p>
+                        </div>
+                    </div>
+                    <div class="philosophy-feature">
+                        <div class="philosophy-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800 mb-2">Inclusive Education</h3>
+                            <p class="text-gray-600">Creating a supportive environment where every student feels valued and empowered to succeed.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'about' %}" class="btn-modern btn-primary mt-8">
+                    <i class="fas fa-info-circle"></i>
+                    Learn More About My Approach
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Resources -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-6">
+        <div class="section-header">
+            <h2 class="section-title">Latest Educational Resources</h2>
+            <p class="section-subtitle">Browse my recently added teaching materials, worksheets, and interactive videos designed to enhance learning.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Notes -->
+            {% for note in latest_notes %}
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image">
+                    <img src="{{note.cover_image.url}}" alt="{{ note.title }}">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-primary">{{ note.subject.name }}</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            {{ note.uploaded_at|date:"M j, Y" }}
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800 line-clamp-2">{{ note.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">{{ note.content|striptags|safe|truncatechars:100 }}</p>
+                    <a href="{% url 'note_detail' note.slug %}" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-eye"></i>
+                        View Note
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- PDF Books -->
+            {% for book in latest_books %}
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image">
+                    <img src="{{book.cover_image.url}}" alt="{{ book.title }}">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-secondary">{{ book.subject.name }}</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            {{ book.uploaded_at|date:"M j, Y" }}
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800 line-clamp-2">{{ book.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">Comprehensive resource guide for {{ book.subject.name }}</p>
+                    <a href="{% url 'book_detail' book.slug %}" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-download"></i>
+                        View Book
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Videos -->
+            {% for video in latest_videos %}
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image cursor-pointer" onclick="openVideoModal('{{ video.slug }}')">
+                    <img src="{{ video.image }}" alt="{{ video.title }}">
+                    <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <i class="fas fa-play-circle text-white text-4xl"></i>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-accent">{{ video.subject.name }}</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            {{ video.uploaded_at|date:"M j, Y" }}
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800 line-clamp-2">{{ video.title }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">Interactive video lesson for {{ video.subject.name }}</p>
+                    <a href="{{ video.video_url }}" class="btn-modern btn-primary text-sm">
+                        <i class="fab fa-youtube"></i>
+                        Watch on YouTube
+                    </a>
+                </div>
+            </div>
+            <!-- Modal for this video -->
+            <div id="modal-{{ video.slug }}" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close" onclick="closeVideoModal('{{ video.slug }}')">×</span>
+                    {{ video.embed_code|safe }}
+                </div>
+            </div>
+            {% endfor %}
+            
+            <!-- Default Resources -->
+            {% if not latest_notes and not latest_books and not latest_videos %}
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/380x200?text=Algebra+Worksheet" alt="Algebra Worksheet">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-primary">Mathematics</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            May 15, 2025
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Algebra Interactive Worksheet</h3>
+                    <p class="text-gray-600 mb-4">Engaging algebra problems designed for grades 9-10 students.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-eye"></i>
+                        View Note
+                    </a>
+                </div>
+            </div>
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/380x200?text=Ecosystem+Guide" alt="Ecosystem Guide">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-secondary">Science</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            May 8, 2025
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Ecosystem Project Guide</h3>
+                    <p class="text-gray-600 mb-4">Comprehensive guide for student-led ecosystem research projects.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fas fa-download"></i>
+                        View Book
+                    </a>
+                </div>
+            </div>
+            <div class="modern-card card-medium animate__animated animate__fadeIn">
+                <div class="card-image">
+                    <img src="https://via.placeholder.com/380x200?text=Literary+Analysis" alt="Literary Analysis">
+                </div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="badge badge-accent">English</span>
+                        <span class="text-xs text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            May 1, 2025
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-gray-800">Literary Analysis Framework</h3>
+                    <p class="text-gray-600 mb-4">Step-by-step video guide for analyzing literature effectively.</p>
+                    <a href="#" class="btn-modern btn-primary text-sm">
+                        <i class="fab fa-youtube"></i>
+                        Watch on YouTube
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="text-center mt-12">
+            <a href="" class="btn-modern btn-secondary">
+                <i class="fas fa-folder-open"></i>
+                View All Resources
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Student Testimonials Section -->
+<section class="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">What Students Say</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Hear from students about their learning experience and academic growth.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for review in reviews %}
+            <div class="bg-white rounded-xl shadow-lg p-6 relative testimonial-quote animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {{ review.student_name|first|upper }}
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold text-gray-800">{{ review.student_name }}</h3>
+                        <div class="flex text-yellow-400">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed">{{ review.review_text|truncatechars:150 }}</p>
+                <div class="mt-4 text-sm text-gray-500">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    {{ review.submitted_at|date:"F Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <!-- Default testimonials if none exist -->
+            <div class="bg-white rounded-xl shadow-lg p-6 relative testimonial-quote animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        S
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold text-gray-800">Raj Shrestha</h3>
+                        <div class="flex text-yellow-400">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed">"The teaching methods are exceptional. Complex concepts become clear and manageable. I've improved significantly in mathematics!"</p>
+                <div class="mt-4 text-sm text-gray-500">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    March 2025
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 relative testimonial-quote animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-secondary to-accent rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        M
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold text-gray-800">Madan Bhandari</h3>
+                        <div class="flex text-yellow-400">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed">"Interactive lessons and personalized attention helped me excel in science. The resources are incredibly helpful!"</p>
+                <div class="mt-4 text-sm text-gray-500">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    April 2025
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-lg p-6 relative testimonial-quote animate__animated animate__fadeInUp">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-accent to-primary rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        E
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="font-bold text-gray-800">Emma Dhakal</h3>
+                        <div class="flex text-yellow-400">
+                            <i class="fas fa-star"></i></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed">"English literature became my favorite subject thanks to the engaging discussions and creative assignments!"</p>
+                <div class="mt-4 text-sm text-gray-500">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    May 2025
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Latest Articles Section -->
+<section class="py-16">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center mb-12">
+            <div>
+                <h2 class="text-3xl font-bold mb-4">Latest Articles & Insights</h2>
+                <p class="text-gray-600 max-w-2xl">Stay updated with my latest thoughts on education, teaching strategies, and academic insights.</p>
+            </div>
+            <a href="{% url 'articles' %}" class="hidden md:inline-flex items-center text-primary hover:text-primary/80 font-semibold">
+                View All Articles <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for article in latest_articles %}
+            <article class="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div class="relative overflow-hidden">
+                    {% if article.thumbnail %}
+                        <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+                    {% else %}
+                        <div class="w-full h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                            <i class="fas fa-newspaper text-4xl text-primary/50"></i>
+                        </div>
+                    {% endif %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-semibold">
+                            {{ article.created_at|date:"M j, Y" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                        <a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a>
+                    </h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">{{ article.content|safe|striptags|truncatechars:80 }}</p>
+                    <div class="flex items-center justify-between">
+                        <a href="{% url 'article_detail' article.slug %}" class="inline-flex items-center text-primary hover:text-primary/80 font-semibold text-sm">
+                            Read More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-1"></i>
+                            5 min read
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <!-- Default articles if none exist -->
+            <article class="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div class="relative overflow-hidden">
+                    <div class="w-full h-48 bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-4xl text-primary/50"></i>
+                    </div>
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-white/90 text-primary px-3 py-1 rounded-full text-sm font-semibold">
+                            May 20, 2025
+                        </span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                        <a href="#">Innovative Teaching Methods</a>
+                    </h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">Exploring how technology and traditional methods can work together...</p>
+                    <div class="flex items-center justify-between">
+                        <a href="#" class="inline-flex items-center text-primary hover:text-primary/80 font-semibold text-sm">
+                            Read More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-1"></i>
+                            5 min read
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <article class="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div class="relative overflow-hidden">
+                    <div class="w-full h-48 bg-gradient-to-br from-secondary/20 to-accent/20 flex items-center justify-center">
+                        <i class="fas fa-brain text-4xl text-secondary/50"></i>
+                    </div>
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-white/90 text-secondary px-3 py-1 rounded-full text-sm font-semibold">
+                            May 15, 2025
+                        </span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-3 line-clamp-2 group-hover:text-secondary transition-colors">
+                        <a href="#">Learning Styles Guide</a>
+                    </h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">Understanding different learning preferences and teaching approaches...</p>
+                    <div class="flex items-center justify-between">
+                        <a href="#" class="inline-flex items-center text-secondary hover:text-secondary/80 font-semibold text-sm">
+                            Read More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-1"></i>
+                            7 min read
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <article class="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div class="relative overflow-hidden">
+                    <div class="w-full h-48 bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-4xl text-accent/50"></i>
+                    </div>
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-white/90 text-accent px-3 py-1 rounded-full text-sm font-semibold">
+                            May 10, 2025
+                        </span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-3 line-clamp-2 group-hover:text-accent transition-colors">
+                        <a href="#">Student Success Stories</a>
+                    </h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2">Celebrating achievements and highlighting effective study strategies...</p>
+                    <div class="flex items-center justify-between">
+                        <a href="#" class="inline-flex items-center text-accent hover:text-accent/80 font-semibold text-sm">
+                            Read More <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-1"></i>
+                            6 min read
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-8 md:hidden">
+            <a href="{% url 'articles' %}" class="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
+                View All Articles <i class="fas fa-arrow-right ml-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-16 bg-gradient-to-r from-primary to-secondary text-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold mb-4">Teaching Impact</h2>
+            <p class="text-white/80 max-w-2xl mx-auto">Numbers that reflect my commitment to educational excellence and student success.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <div class="text-4xl md:text-5xl font-bold mb-2" data-count="250">500+</div>
+                <div class="text-white/80 text-sm md:text-base">Students Taught</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl md:text-5xl font-bold mb-2" data-count="8">{{teacher.experience_years}}</div>
+                <div class="text-white/80 text-sm md:text-base">Years Experience</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl md:text-5xl font-bold mb-2" data-count="15">5</div>
+                <div class="text-white/80 text-sm md:text-base">Subjects Covered</div>
+            </div>
+            <div class="text-center">
+                <div class="text-4xl md:text-5xl font-bold mb-2" data-count="95">80%</div>
+                <div class="text-white/80 text-sm md:text-base">Success Rate %</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Start Your Learning Journey?</h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">Join me for personalized tutoring sessions, access premium resources, or simply get in touch to discuss your educational goals.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'meetup_request' %}" class="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-semibold transition duration-300 inline-flex items-center justify-center">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    Schedule a Meetup
+                </a>
+                <a href="" class="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 rounded-lg font-semibold transition duration-300 inline-flex items-center justify-center">
+                    <i class="fas fa-book-open mr-2"></i>
+                    Browse Resources
+                </a>
+                <a href="{% url 'contact' %}" class="bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-lg font-semibold transition duration-300 inline-flex items-center justify-center">
+                    <i class="fas fa-envelope mr-2"></i>
+                    Contact Me
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    // Slideshow functionality
+    function runSlideshow() {
+        const slides = document.querySelectorAll('#slideshow .slideshow-slide');
+        let currentIndex = 0;
+
+        function showNextSlide() {
+            slides[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % slides.length;
+            slides[currentIndex].classList.add('active');
+        }
+
+        setInterval(showNextSlide, 3000);
+    }
+
+    // Intersection Observer for animations
+    function animateOnScroll() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('animate__animated', 'animate__fadeIn');
+                    }, index * 100);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.resource-card').forEach((card) => {
+            observer.observe(card);
+        });
+    }
+
+    // Modal functions
+    function openVideoModal(slug) {
+        const modal = document.getElementById(`modal-${slug}`);
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeVideoModal(slug) {
+        const modal = document.getElementById(`modal-${slug}`);
+        if (modal) {
+            modal.style.display = 'none';
+            const iframe = modal.querySelector('iframe');
+            if (iframe) {
+                const src = iframe.src;
+                iframe.src = src;
+            }
+        }
+    }
+
+    // Close modal on outside click
+    document.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal')) {
+            const slug = event.target.id.replace('modal-', '');
+            closeVideoModal(slug);
+        }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        runSlideshow();
+        animateOnScroll();
+    });
+</script>
+{% endblock %}

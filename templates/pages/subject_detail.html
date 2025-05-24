@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }} - Teacher Portfolio{% endblock %}
+
+{% block extra_head %}
+<style>
+    .resource-card {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .resource-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+    .video-thumbnail {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: transform 0.3s ease;
+    }
+    .video-thumbnail:hover {
+        transform: scale(1.02);
+    }
+    .resource-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .modal.active {
+        display: flex;
+        opacity: 1;
+    }
+    .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 900px;
+        max-height: 90vh;
+        overflow: hidden;
+        position: relative;
+        transform: scale(0.95);
+        transition: transform 0.3s ease;
+    }
+    .modal.active .modal-content {
+        transform: scale(1);
+    }
+    .modal-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.2s ease;
+    }
+    .modal-close:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+        transform: rotate(90deg);
+    }
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+    }
+    .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    .resource-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 8px;
+    }
+    .empty-state {
+        background-color: rgba(249, 250, 251, 0.8);
+        border: 1px dashed rgba(209, 213, 219, 0.7);
+        border-radius: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Resources Section -->
+<section class=" bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-light text-gray-900 mb-4 tracking-tight">{{ subject.name }} Resources</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Comprehensive learning materials to master {{ subject.name }} concepts.
+            </p>
+        </div>
+
+        <!-- Resource Navigation Tabs -->
+        <div class="flex justify-center mb-10">
+            <div class="inline-flex rounded-lg bg-gray-100 p-1">
+                <button class="resource-tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200" data-category="all">All Resources</button>
+                <button class="resource-tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200" data-category="notes">Notes</button>
+                <button class="resource-tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200" data-category="books">Books</button>
+                <button class="resource-tab px-4 py-2 text-sm font-medium rounded-md transition-all duration-200" data-category="videos">Videos</button>
+            </div>
+        </div>
+
+        <!-- Resources Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Notes -->
+            {% for note in notes %}
+            <div class="resource-card bg-white rounded-xl overflow-hidden" data-category="notes">
+            <div class="p-4 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <span class="resource-badge bg-blue-100 text-blue-800">
+                <svg class="resource-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Note
+                </span>
+            </div>
+            {% if note.cover_image %}
+            <div class="aspect-w-16 aspect-h-9">
+                <img src="{{ note.cover_image.url }}" alt="{{ note.title }}" class="object-cover w-full h-48">
+            </div>
+            {% endif %}
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ note.title }}</h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ note.content|striptags|safe|truncatechars:120 }}</p>
+                {% if note.subject.course.name %}
+                <div class="flex items-center mb-4 text-gray-600">
+                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+                </svg>
+                <span class="text-sm font-medium">{{ note.subject.course.name }}</span>
+                </div>
+                {% endif %}
+                <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500 flex items-center">
+                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ note.uploaded_at|date:"M j, Y" }}
+                </span>
+                <a href="{% url 'note_detail' note.slug %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200">
+                    View
+                    <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </a>
+                </div>
+            </div>
+            </div>
+            {% endfor %}
+
+            <!-- Books -->
+            {% for book in books %}
+            <div class="resource-card bg-white rounded-xl overflow-hidden" data-category="books">
+            <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50">
+                <span class="resource-badge bg-amber-100 text-amber-800">
+                <svg class="resource-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                Book
+                </span>
+            </div>
+            {% if book.cover_image %}
+            <div class="aspect-w-16 aspect-h-9">
+                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="object-cover w-full h-48">
+            </div>
+            {% endif %}
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ book.title }}</h3>
+                <p class="text-gray-600 mb-4">Comprehensive {{ subject.name }} reference material.</p>
+                {% if book.subject.course.name %}
+                <div class="flex items-center mb-4 text-gray-600">
+                <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+                </svg>
+                <span class="text-sm font-medium">{{ book.subject.course.name }}</span>
+                </div>
+                {% endif %}
+                <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500 flex items-center">
+                    <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {{ book.uploaded_at|date:"M j, Y" }}
+                </span>
+                <a href="{% url 'book_detail' book.slug%}" class="inline-flex items-center text-amber-600 hover:text-amber-800 font-medium transition-colors duration-200">
+                    Download
+                    <svg class="w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </a>
+                </div>
+            </div>
+            </div>
+            {% endfor %}
+
+            <!-- Videos -->
+            {% for video in videos %}
+            <div class="resource-card bg-white rounded-xl overflow-hidden" data-category="videos">
+                <div class="p-4 bg-gradient-to-r from-red-50 to-pink-50">
+                    <span class="resource-badge bg-red-100 text-red-800">
+                        <svg class="resource-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Video
+                    </span>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ video.title }}</h3>
+                    <div class="mb-4 relative group">
+                        <img src="{{ video.image }}" alt="{{ video.title }}" class="video-thumbnail" data-video-id="{{ video.slug }}">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="bg-black/40 rounded-full p-3">
+                                <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-500 flex items-center">
+                            <svg class="w-4 h-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {{ video.uploaded_at|date:"M j, Y" }}
+                        </span>
+                        <div class="flex space-x-3">
+                            <button onclick="openVideoModal('{{ video.slug }}')" class="text-red-600 hover:text-red-800 font-medium transition-colors duration-200">
+                                Play
+                            </button>
+                            <a href="{{ video.video_url }}" target="_blank" class="text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200">
+                                YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal for this video -->
+                <div id="modal-{{ video.slug }}" class="modal">
+                    <div class="modal-content">
+                        <span class="modal-close" onclick="closeVideoModal('{{ video.slug }}')">&times;</span>
+                        <div class="video-container">
+                            {{ video.embed_code|safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        {% if not notes and not books and not videos %}
+        <div class="empty-state text-center py-16 px-6 mb-8 rounded-xl">
+            <svg class="mx-auto h-16 w-16 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">No resources available yet</h3>
+            <p class="mt-2 text-gray-600 max-w-md mx-auto">
+                We're currently preparing {{ subject.name }} learning materials. Check back soon!
+            </p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+function openVideoModal(slug) {
+    const modal = document.getElementById(`modal-${slug}`);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeVideoModal(slug) {
+    const modal = document.getElementById(`modal-${slug}`);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        // Stop video playback by resetting iframe src
+        const iframe = modal.querySelector('iframe');
+        if (iframe) {
+            const src = iframe.src;
+            iframe.src = src;
+        }
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        const slug = event.target.id.replace('modal-', '');
+        closeVideoModal(slug);
+    }
+});
+
+// Resource filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.resource-tab');
+    const resources = document.querySelectorAll('.resource-card');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('bg-white', 'shadow-sm', 'text-gray-900'));
+            this.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
+            
+            // Filter resources
+            const category = this.dataset.category;
+            resources.forEach(resource => {
+                resource.style.display = 'none';
+                if (category === 'all' || resource.dataset.category === category) {
+                    resource.style.display = 'block';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
