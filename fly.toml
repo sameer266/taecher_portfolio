@@ -1,4 +1,4 @@
-app = "your-app-name"         # must be unique
+app = "narayan120"         # must be unique
 primary_region = "ams"        # or other region close to you
 
 [build]

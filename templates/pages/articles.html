@@ -1,17 +1,108 @@
 {% extends "base.html" %}
 {% block title %}Articles - Teacher Portfolio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-btn {
+        transition: all 0.3s ease;
+    }
+    .filter-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    .article-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .article-card.hidden {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        pointer-events: none;
+    }
+    .date-badge {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    .category-badge {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    .no-results {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.5s ease;
+    }
+    .no-results.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class=" bg-gradient-to-b from-gray-50 to-white">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+<section class="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center mb-12">
             <h1 class="text-5xl font-light text-gray-900 mb-4 tracking-tight">Educational Insights</h1>
             <p class="text-lg text-gray-600 max-w-3xl mx-auto">Explore my latest articles on teaching strategies, classroom experiences, and educational trends.</p>
         </div>
 
+        <!-- Filter Controls -->
+        <div class="mb-8 space-y-6">
+            <!-- Date Filters -->
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter by Date</h3>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <button class="filter-btn date-filter active px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-filter="all">
+                        All Articles
+                    </button>
+                    <button class="filter-btn date-filter px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-filter="this-month">
+                        This Month
+                    </button>
+                    <button class="filter-btn date-filter px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-filter="last-month">
+                        Last Month
+                    </button>
+                    <button class="filter-btn date-filter px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-filter="this-year">
+                        This Year
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category Filters -->
+            <div class="text-center">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter by Category</h3>
+                <div class="flex flex-wrap justify-center gap-3" id="category-filters">
+                    <button class="filter-btn category-filter active px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-category="all">
+                        All Categories
+                    </button>
+                    <!-- Dynamic category buttons will be added here -->
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="text-center">
+                <div class="max-w-md mx-auto relative">
+                    <input type="text" id="search-input" placeholder="Search articles..." class="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles Count -->
+        <div class="text-center mb-6">
+            <p class="text-gray-600" id="articles-count">Showing <span id="visible-count">0</span> of <span id="total-count">0</span> articles</p>
+        </div>
+
         <!-- Articles Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="articles-grid">
             {% for article in articles %}
-            <article class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary/20 transform hover:-translate-y-1 group">
+            <article class="article-card bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100 hover:border-primary/20 transform hover:-translate-y-1 group" 
+                     data-date="{{ article.created_at|date:'Y-m-d' }}"
+                     data-title="{{ article.title|lower }}"
+                     data-content="{{ article.content|striptags|safe|lower }}"
+                     data-tags="{% for tag in article.tags.all %}{{ tag.name|lower }}{% if not forloop.last %} {% endif %}{% endfor %}">
+                
                 <div class="relative h-48 overflow-hidden">
                     {% if article.thumbnail %}
                     <img src="{{ article.thumbnail.url }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -22,12 +113,22 @@
                         </svg>
                     </div>
                     {% endif %}
+                    
+                    <!-- Date Badge -->
+                    <div class="absolute top-4 left-4">
+                        <span class="date-badge inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white">
+                            {{ article.created_at|date:"M j" }}
+                        </span>
+                    </div>
+                    
+                    <!-- Article Type Badge -->
                     <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary text-white">
                             Article
                         </span>
                     </div>
                 </div>
+                
                 <div class="p-6">
                     <div class="flex items-center text-sm text-gray-500 mb-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,8 +141,10 @@
                         </svg>
                         5 min read
                     </div>
+                    
                     <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{{ article.title }}</h3>
                     <p class="text-gray-600 mb-4 line-clamp-3">{{ article.content|striptags|safe|truncatechars:120 }}</p>
+                    
                     <div class="flex items-center justify-between">
                         <a href="{% url 'article_detail' article.slug %}" class="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors duration-200">
                             Read article
@@ -49,10 +152,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </a>
+                        
                         {% if article.tags.exists %}
                         <div class="flex space-x-1">
                             {% for tag in article.tags.all|slice:":2" %}
-                            <span class="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">{{ tag.name }}</span>
+                            <span class="category-badge text-xs px-2 py-1 text-white rounded-full category-tag" data-category="{{ tag.name|lower }}">{{ tag.name }}</span>
                             {% endfor %}
                         </div>
                         {% endif %}
@@ -60,7 +164,7 @@
                 </div>
             </article>
             {% empty %}
-            <div class="col-span-full text-center py-12">
+            <div class="col-span-full text-center py-12" id="empty-state">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -68,6 +172,15 @@
                 <p class="mt-1 text-gray-500">Check back later for new educational content.</p>
             </div>
             {% endfor %}
+        </div>
+
+        <!-- No Results Message -->
+        <div class="no-results col-span-full text-center py-12 hidden" id="no-results">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">No articles found</h3>
+            <p class="mt-1 text-gray-500">Try adjusting your search or filter criteria.</p>
         </div>
 
         <!-- Pagination (if applicable) -->
@@ -104,4 +217,161 @@
         {% endif %}
     </div>
 </section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize
+    const $articles = $('.article-card');
+    const $noResults = $('#no-results');
+    const $emptyState = $('#empty-state');
+    const $visibleCount = $('#visible-count');
+    const $totalCount = $('#total-count');
+    
+    // Set initial counts
+    updateArticleCount();
+    
+    // Generate dynamic category filters
+    generateCategoryFilters();
+    
+    // Date filter functionality
+    $('.date-filter').on('click', function() {
+        const filter = $(this).data('filter');
+        $('.date-filter').removeClass('active');
+        $(this).addClass('active');
+        
+        filterArticles();
+    });
+    
+    // Category filter functionality
+    $(document).on('click', '.category-filter', function() {
+        const category = $(this).data('category');
+        $('.category-filter').removeClass('active');
+        $(this).addClass('active');
+        
+        filterArticles();
+    });
+    
+    // Search functionality
+    $('#search-input').on('input', function() {
+        filterArticles();
+    });
+    
+    function generateCategoryFilters() {
+        const categories = new Set();
+        
+        $('.category-tag').each(function() {
+            const category = $(this).data('category');
+            if (category) {
+                categories.add(category);
+            }
+        });
+        
+        categories.forEach(category => {
+            const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
+            $('#category-filters').append(`
+                <button class="filter-btn category-filter px-4 py-2 rounded-full border border-gray-300 text-sm font-medium hover:border-primary hover:text-primary" data-category="${category}">
+                    ${categoryName}
+                </button>
+            `);
+        });
+    }
+    
+    function filterArticles() {
+        const activeDate = $('.date-filter.active').data('filter');
+        const activeCategory = $('.category-filter.active').data('category');
+        const searchTerm = $('#search-input').val().toLowerCase();
+        
+        let visibleCount = 0;
+        
+        $articles.each(function() {
+            const $article = $(this);
+            const articleDate = new Date($article.data('date'));
+            const articleTitle = $article.data('title');
+            const articleContent = $article.data('content');
+            const articleTags = $article.data('tags');
+            
+            let showArticle = true;
+            
+            // Date filtering
+            if (activeDate !== 'all') {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                switch (activeDate) {
+                    case 'this-month':
+                        showArticle = articleDate.getMonth() === currentMonth && 
+                                    articleDate.getFullYear() === currentYear;
+                        break;
+                    case 'last-month':
+                        const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                        const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                        showArticle = articleDate.getMonth() === lastMonth && 
+                                    articleDate.getFullYear() === lastMonthYear;
+                        break;
+                    case 'this-year':
+                        showArticle = articleDate.getFullYear() === currentYear;
+                        break;
+                }
+            }
+            
+            // Category filtering
+            if (showArticle && activeCategory !== 'all') {
+                showArticle = articleTags.includes(activeCategory);
+            }
+            
+            // Search filtering
+            if (showArticle && searchTerm) {
+                showArticle = articleTitle.includes(searchTerm) || 
+                            articleContent.includes(searchTerm) ||
+                            articleTags.includes(searchTerm);
+            }
+            
+            // Show/hide article with animation
+            if (showArticle) {
+                $article.removeClass('hidden');
+                visibleCount++;
+            } else {
+                $article.addClass('hidden');
+            }
+        });
+        
+        // Show/hide no results message
+        if (visibleCount === 0 && $articles.length > 0) {
+            $noResults.removeClass('hidden').addClass('show');
+            $emptyState.hide();
+        } else {
+            $noResults.addClass('hidden').removeClass('show');
+            if ($articles.length === 0) {
+                $emptyState.show();
+            }
+        }
+        
+        updateArticleCount();
+    }
+    
+    function updateArticleCount() {
+        const visibleArticles = $('.article-card:not(.hidden)').length;
+        const totalArticles = $('.article-card').length;
+        
+        $visibleCount.text(visibleArticles);
+        $totalCount.text(totalArticles);
+    }
+    
+    // Smooth scroll to articles when filter is applied
+    $('.filter-btn').on('click', function() {
+        setTimeout(() => {
+            $('html, body').animate({
+                scrollTop: $('#articles-grid').offset().top - 100
+            }, 500);
+        }, 300);
+    });
+    
+    // Add loading animation
+    $articles.on('transitionend', function() {
+        $(this).removeClass('loading');
+    });
+});
+</script>
 {% endblock %}
